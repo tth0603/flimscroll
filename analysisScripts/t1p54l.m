@@ -1,5 +1,6 @@
-% 210817: As in t1p54k, but this time with the third & 4th neutral replicate data
-% set (190809)
+% Code to reporduce all figures from Harden et al 2022 save for those
+% pertaining to idle periods (i.e. Figs 3E, F, and SFig. 9; see
+% t1p54r) and image acquiosition conditions (SFig 1; see t1p540)
 
 %% load workspace
 % neutral spacer eveS2
@@ -70,7 +71,8 @@ zldCia1 = zldAnal1.cia;
 zldSpots1 = zldAnal1.spotsMat;
 zldNukes1 = zldAnal1.nukesMat;
 % 191024
-load t1p59e2.dat -mat
+% load t1p59e2.dat -mat
+load t1p59m.dat -mat
 zldAnal2 = analData;
 clear analData
 zldCia2 = zldAnal2.cia;
@@ -306,7 +308,7 @@ sum(eventBinMat);
 figNum = 30;
 nukeVect = 348;
 specifiedFullTraceArrayFli(spaceAnal1,nukeVect,figNum);
-%% a number of traces (for resubmission, SFig ??)
+%% a number of traces (for resubmission, SFig 2)
 % wt:
 % to select specific nukes:
 fignum = 100;
@@ -341,7 +343,7 @@ for i = 1:9
     saveas(figure(f),fn,'svg');
 end
 
-%% space traces - SFig ??
+%% space traces - SFig 2
 fignum = 110;
 spacev = [315 317 319 321 290 306 283 271 143]; % 
 % spacev = [166 222 226 283 284 290 315 319 348];
@@ -374,7 +376,7 @@ for i = 1:9
     saveas(figure(f),fn,'svg');
 end
 
-%% spots v T - 1D
+%% spots v T - Fig 1D
 %Importantly, here we normalize by the median number of nukes in all
 %experiments. Run the nukes binning section for that
 % neutral:
@@ -546,7 +548,7 @@ ylabel('number of spots');xlabel('time (s)');title('Total spots v. time');legend
 %also, if you ever do get this working, you have to convert frames back to
 %time at the end
 
-%% First passage: global gamma fit: global rate, active fraction. fig. 1B. 
+%% First passage: global gamma fit: global rate, active fraction. fig. 2B. 
 % center nukes, norm'd to one, Fit the rate (scale
 % parameter,B) constant globally:
 
@@ -581,19 +583,19 @@ stepsV = gFit4(2:6);
 AfV = gFit4(7:end);
 for i = 1:5
     gCDF = AfV(i)*gamcdf(xs,stepsV(i),rate);
-    hold on;plot(xs,gCDF,'Color','k','LineWidth',0.5);shg
+    hold on;plot(xs,gCDF,'--','Color',colr{i},'LineWidth',0.75);shg
 end
 % here are the fit parameters saved as the variable gFit4:
 % save C:\Users\thard\Dropbox\matlab\data\t1p54k4.dat gFit4
 
 %% save
-fp = 'C:\Users\thard\Dropbox\hardenTFfunction2020\figures\figs\';
-saveas(gca,[fp 'firstPassageCurve&Fits211006'],'svg'); %this is for the resubmission. Identical to the original, but with the two extra neutral reps included. 
+fp = 'C:\Users\tth12\Dropbox\hardenTFfunction2020\figures\figs\';
+saveas(gca,[fp 'firstPassageCurve&Fits220328'],'svg'); %this is for the resubmission. Identical to the original, but with the two extra neutral reps included. 
 % the normalization for the neutral conditions are hacky, but well
 % justified (see initialFractionBin2 ~line 112; firstEventBootstrapPlotter2
 % ~line 48). 10000 bootstraps. 
 
-%% first bind BS
+%% first bind BS - for Fig. 2B
 % generate bootstraps
 bs = 10000; %211005 - i used 10000 BSs (~4.8 hours on my laptop) for the re-submission. excessive.
 bsCell = {};
@@ -618,7 +620,7 @@ toc
 % 211006 here are 10000 BSs for the resubmission figure:
 % save C:\Users\thard\Dropbox\matlab\data\t1p54k2.dat fitErrStruc bsCell
 
-%% 211008 enhanced error analysis
+%% 211008 enhanced error analysis - for FIg. 2B
 % bc the 10000 bootstraps look fin on the plot, but have have some insane
 % outliers in the fitting, let's redo the error using only the first 97%
 % of bootstraps. The outliers do not represent sensical fit
@@ -636,7 +638,7 @@ fitErrStruc.std = std(fitMat90);
 % save C:\Users\thard\Dropbox\matlab\data\t1p54k3.dat fitErrStruc bsCell
 
 
-%% plot bootstraps
+%% plot bootstraps - Fig. 2B
 fignum = 22; 
 % load C:\Users\thard\Dropbox\matlab\data\t1p54k1.dat -mat % original submision
 % load C:\Users\thard\Dropbox\matlab\data\t1p54k2.dat -mat % re-submission 211006  (this takes a long time to plot -- 7 minutes on my laptop)
@@ -650,13 +652,13 @@ ylabel('Fraction of nuclei')
 xlabel('Time (s)')
 toc;
 %% save
-fp = 'C:\Users\thard\Dropbox\hardenTFfunction2020\figures\figs\';
-saveas(gca,[fp 'firstPassageBS211006'],'svg'); % pair with firstPassageCurve&Fits211006
+fp = 'C:\Users\tth12\Dropbox\hardenTFfunction2020\figures\figs\';
+saveas(gca,[fp 'firstPassageBS220328'],'svg'); % pair with firstPassageCurve&Fits211006
 
-%% surv Freq, center w/o dropouts 
+%% surv Freq of active trxn, center (unused)
 % -- choose this one
 timestep = 15;
-fignum = 31;
+fignum = 30;
 activationParamsCenterDropout = zeros(5,3);
 freqCenterDropout = zeros(5,1);
 eventNumberCenterDropout = zeros(5,1);
@@ -667,10 +669,13 @@ for i = 1:5
 %     out = frequency_dwellFli3(dropout(centerCia1{i}),dropout(centerCia2{i}),timestep,colr{i},fignum,[0.9 0.01 0.001],[]); % 
 %     expLengthMat(i,1:2) = out.expLength;
     try
-        out = frequency_dwellFli3(dropout(centerCia1{i}),dropout(centerCia2{i}),dropout(centerCia3{i}),dropout(centerCia4{i}),timestep,colr{i},fignum,[0.8 0.1 0.01],[]);
+%         out = frequency_dwellFli5(dropout(centerCia1{i}),dropout(centerCia2{i}),dropout(centerCia3{i}),dropout(centerCia4{i}),timestep,colr{i},fignum,[0.8 0.1 0.01],[]); % dropout, center
+        out = frequency_dwellFli5((centerCia1{i}),(centerCia2{i}),(centerCia3{i}),(centerCia4{i}),timestep,colr{i},fignum,[0.8 0.1 0.01],[]); % center
+%         out = frequency_dwellFli5(dropout(ciaCell1{i}),dropout(ciaCell2{i}),dropout(ciaCell3{i}),dropout(ciaCell4{i}),timestep,colr{i},fignum,[0.8 0.1 0.01],[]); % dropout, whole stripe
             expLengthMat(i,:) = out.expLength;
     catch
-        out = frequency_dwellFli3(dropout(centerCia1{i}),dropout(centerCia2{i}),timestep,colr{i},fignum,[0.8 0.1 0.01],[]); % 
+%         out = frequency_dwellFli5(dropout(centerCia1{i}),dropout(centerCia2{i}),timestep,colr{i},fignum,[0.8 0.1 0.01],[]); % dropout, center
+        out = frequency_dwellFli5((centerCia1{i}),(centerCia2{i}),timestep,colr{i},fignum,[0.8 0.1 0.01],[]); % center
         expLengthMat(i,1:2) = out.expLength;
     end
     activationParamsCenterDropout(i,:) = [out.a out.k1 out.k2];
@@ -678,35 +683,60 @@ for i = 1:5
     eventNumberCenterDropout(i) = out.eventNumber;
     lowTimeCenterDropout(i) = out.lowTimes;
 end
-set(gca,'YLim',[7e-6 5e-3],'XLim',[0 2300]);
+set(gca,'YLim',[1e-5 1.3e-2],'XLim',[0 2300]);
 
-%% surv Freq, center, w/o dropouts, bootstraps
+%% active trxn survival & fit; Fig. 3B
+fignum = 31;
+numOfBS = 10000;
+flag = 1;
+
+inarg = [0.8 0.1 0.01];
+activationParamsCenter = zeros(5,3);
+for i = 1:5
+    [out,p] = survivalPlotFromVector((centerCia{i}),6,2,1,3600,fignum,inarg,colr{i}); %
+    set(p,'Color',colr{i});
+    if flag == 1 
+        [~,pbs] = bootstrapsBootstraps((centerCia{i}),6,numOfBS,colr{i},fignum);
+    end
+    hold on;
+    activationParamsCenter(i,:) = [out.a out.k1 out.k2];
+end
+set(gca,'Box',true,'FontSize',16,'YLim',[-6.5 0],'XLim',[0 2300]);
+
+%% save this boot strap plot:
+fp = 'C:\Users\tth12\Dropbox\hardenTFfunction2020\figures\figs\';
+% saveas(gca,[fp 'survFreqCurveFit&err220328'],'svg'); % this includes the new, full analysis of the zld rep from 191024
+% saveas(gca,[fp 'activeTrxnSurvFit&err220402'],'svg'); % this includes dropouts
+saveas(gca,[fp 'activeTrxnSurvFit&err220412'],'svg'); % this is the survival version of the plot
+
+%% surv Freq, center, bootstraps (unused)
 timestep = 15;
 fignum = 33;
 constructs = 1:5;
 tic;
 for i = constructs
-    [~,pbs] = bootstrapsFrequency(dropout(centerCia{i}),6,10000,freqCenterDropout(i),colr{i},fignum);
+%     [~,pbs] = bootstrapsFrequency(dropout(centerCia{i}),6,1000,freqCenterDropout(i),colr{i},fignum);
+    [~,pbs] = bootstrapsFrequency(centerCia{i},6,10000,freqCenterDropout(i),colr{i},fignum);
     hold on
 end
 toc
 % this will take about 5 min to run on your lab machine with bs = 10000
 %
-activationParamsCenterDropout = zeros(5,3);
-freqCenterDropout = zeros(5,1);
 for i = constructs
-%     out = frequency_dwellFli3(dropout(centerCia1{i}),dropout(centerCia2{i}),timestep,colr{i},fignum,[0.9 0.01 0.001],[]);
     try
-        out = frequency_dwellFli3(dropout(centerCia1{i}),dropout(centerCia2{i}),dropout(centerCia3{i}),dropout(centerCia4{i}),timestep,colr{i},fignum,[0.9 0.01 0.001],[]); % 
+%         out = frequency_dwellFli5(dropout(centerCia1{i}),dropout(centerCia2{i}),dropout(centerCia3{i}),dropout(centerCia4{i}),timestep,colr{i},fignum,[0.9 0.01 0.001],[]); % 
+        out = frequency_dwellFli5((centerCia1{i}),(centerCia2{i}),(centerCia3{i}),(centerCia4{i}),timestep,colr{i},fignum,[0.9 0.01 0.001],[]); % 
     catch
-        out = frequency_dwellFli3(dropout(centerCia1{i}),dropout(centerCia2{i}),timestep,colr{i},fignum,[0.9 0.01 0.001],[]); % 
+%         out = frequency_dwellFli5(dropout(centerCia1{i}),dropout(centerCia2{i}),timestep,colr{i},fignum,[0.9 0.01 0.001],[]); % 
+        out = frequency_dwellFli5((centerCia1{i}),(centerCia2{i}),timestep,colr{i},fignum,[0.9 0.01 0.001],[]); % 
     end
     hold on
 end
-set(gca,'YLim',[7e-6 5e-3],'XLim',[0 2300]);
+set(gca,'YLim',[1e-5 1.3e-2],'XLim',[0 2300]);
 %% save this boot strap plot:
 fp = 'C:\Users\tth12\Dropbox\hardenTFfunction2020\figures\figs\';
-saveas(gca,[fp 'survFreqCurveFit&err211014'],'svg');
+% saveas(gca,[fp 'survFreqCurveFit&err220328'],'svg'); % this includes the new, full analysis of the zld rep from 191024
+saveas(gca,[fp 'survFreqCurveFit&err220401'],'svg'); % this includes dropouts
 
 %% active param errors
 inarg = [1 3600 0.9 0.01 0.001]; %[tm tx a k1 k2]
@@ -716,8 +746,9 @@ tic;
 constructs = 1:5;
 activeCenterFits = {};
 activationParamsCenterDropoutStd1000 = zeros(5,3);
-parfor i = constructs
-    bsFits = bootstrapsBootstrapsFit(dropout(centerCia{i}),6,10000,2,inarg);
+% parfor i = constructs
+for i = constructs
+    bsFits = bootstrapsBootstrapsFit((centerCia{i}),6,numOfBS,2,inarg);
     activeCenterFits{i} = bsFits;
     activationParamsCenterDropoutStd1000(i,:) = bsFits.std;
 end
@@ -725,14 +756,14 @@ toc
 % should take about 8 min on your lab machine with bs = 10000
 
 %% save the BSs:
-save C:\Users\tth12\Dropbox\matlab\data\activeParamErra211013.dat activeCenterFits activationParamsCenterDropoutStd1000
+save C:\Users\tth12\Dropbox\matlab\data\activeParamErra220401.dat activeCenterFits activationParamsCenterDropoutStd1000
 
 % NB: I've looked at fitting both with rates and taus. They are for the
 % most part the same, with the rate fitting a bit better behaved (smaller,
 % more reasonable error bars). The one difference in neutral, that gets a
 % bit crazy with the taus fit. 201201
 
-%% table. active params. center, no dropout 
+%% table. active params. center, TABLE 2
 % set up table
 Reporter = tits';
 % rates:
@@ -741,11 +772,11 @@ A = zeros(5,1);k1 = A; k2 = A; %allocate space, amke things col vectors
 Aerr = A; k1err = A; k2err = A;
 errMat = activationParamsCenterDropoutStd1000;
 for i = 1:5
-    A(i) = round(activationParamsCenterDropout(i,1),2);
+    A(i) = round(activationParamsCenter(i,1),2);
     Aerr(i) = round(errMat(i,1),2);
-    k1(i) = (activationParamsCenterDropout(i,2));
+    k1(i) = (activationParamsCenter(i,2));
     k1err(i) = round(errMat(i,2),3);
-    k2(i) = (activationParamsCenterDropout(i,3));
+    k2(i) = (activationParamsCenter(i,3));
     k2err(i) = round(errMat(i,3),4);
 end
 % onTimes = table(Reporter,A,Aerr,k1,k1err,k2,k2err)
@@ -762,14 +793,14 @@ activeParamsCenterDropout = table(Reporter,A,Aerr,t1,t1err,t2,t2err)
 
 % NB: 211014 I updated v3 of the tables (in C:\Users\tth12\Dropbox\hardenTFfunction2020\210226cellSystems) with these values 
 
-%% bar chart. active params. center, no dropout 
+%% bar chart. active params. center, Fig 3B
 ax201 = figure(201);
 bar(1,A(1),0.4,'FaceColor',colr{1},'EdgeColor','none'); %initiate the bar chart first
 for i = 2:5
     hold on; bar(i,A(i),0.4,'FaceColor',colr{i},'EdgeColor','none');
 end
 xticks([1 2 3 4 5]);
-set(gca,'xticklabels',tits(1:5),'yLim',[0 0.8],'Box',true,'FontSize',16,'xLim',[0.5 5.5]);
+set(gca,'xticklabels',tits(1:5),'yLim',[0 1],'Box',true,'FontSize',16,'xLim',[0.5 5.5]);
 xticklabel_rotate([],45,[],'FontSize',16);
 hold on;
 er = errorbar(1,A(1),Aerr(1),Aerr(1));
@@ -789,7 +820,7 @@ for i = 2:5
     hold on; bar(i,t1(i),0.4,'FaceColor',colr{i},'EdgeColor','none');
 end
 xticks([1 2 3 4 5]);
-set(gca,'xticklabels',tits(1:5),'yLim',[0 250],'Box',true,'FontSize',16,'xLim',[0.5 5.5]);
+set(gca,'xticklabels',tits(1:5),'yLim',[0 70],'Box',true,'FontSize',16,'xLim',[0.5 5.5]);
 xticklabel_rotate([],45,[],'FontSize',16);
 hold on;
 er = errorbar(1,t1(1),t1err(1),t1err(1));
@@ -809,7 +840,7 @@ for i = 2:5
     hold on; bar(i,t2(i),0.4,'FaceColor',colr{i},'EdgeColor','none');
 end
 xticks([1 2 3 4 5]);
-set(gca,'xticklabels',tits(1:5),'yLim',[0 750],'Box',true,'FontSize',16,'xLim',[0.5 5.5]);
+set(gca,'xticklabels',tits(1:5),'yLim',[0 430],'Box',true,'FontSize',16,'xLim',[0.5 5.5]);
 xticklabel_rotate([],45,[],'FontSize',16);
 hold on;
 er = errorbar(1,t2(1),t2err(1),t2err(1));
@@ -824,23 +855,25 @@ end
 set(gca,'Box',true);
 %% save
 fp = 'C:\Users\tth12\Dropbox\hardenTFfunction2020\figures\figs\';
-saveas(ax201,[fp 'freqBarAs211014'],'svg');
-saveas(ax202,[fp 'freqBarTau1211014'],'svg');
-saveas(ax203,[fp 'freqBarTau2211014'],'svg');
+saveas(ax201,[fp 'freqBarAs220401'],'svg');
+saveas(ax202,[fp 'freqBarTau1220401'],'svg');
+saveas(ax203,[fp 'freqBarTau220401'],'svg');
 
 % NB: updated and saved 211014
 
-%% surv Freq, EARLY, center, w/o dropouts
+%% active trxn surv , EARLY, center, Fig. 3C
 %used in paper figs
-fignum = 34;
+fignum = 35;
+flag = 1; % 1 for bootstraps, 0 for not
+inarg = [0.9 0.01 0.001];
+numOfBS = 10000;
 split = 1/5; %Sets the divide btwn the two bins set to 1/2 for 50/50, 1/3 for first third in "early" bin, etc
 timestep = 15;
 onHalf1cell1 = {};onHalf1cell2 = {};freqCenterDropoutEarly = [];
 activationParamsCenterDropoutEarly = zeros(5,3);
 freqCenterDropoutEarly = zeros(5,1);
 eventNumberCenterDropoutEarly = zeros(5,1);
-lowTimeCenterDropoutEarly = zeros(5,1);
-flag = 0; % 1 for bootstraps, 0 for not
+lowTimeCenterDropoutEarly = zeros(5,1);expLengthMatEarly = [];
 constructs = 1:5;
 for i = constructs
     % treat each rep indie:
@@ -850,7 +883,8 @@ for i = constructs
     t50 = ts(floor(L*split));
     logi = mat1(:,7) <= t50;
     half1mat = mat1(logi,:);
-    onHalf1cell1{i} = dropout(half1mat);
+%     onHalf1cell1{i} = dropout(half1mat);
+    onHalf1cell1{i} = (half1mat);
     num = sum(logi);
     denom = size(half1mat);
     % the other rep:
@@ -860,7 +894,8 @@ for i = constructs
     t50 = ts(floor(L*split));
     logi = mat2(:,7) <= t50;
     half1mat = mat2(logi,:);
-    onHalf1cell2{i} = dropout(half1mat);
+%     onHalf1cell2{i} = dropout(half1mat);
+    onHalf1cell2{i} = (half1mat);
     % maybe there are other reps:
     try
         % rep3
@@ -870,7 +905,8 @@ for i = constructs
         t50 = ts(floor(L*split));
         logi = mat3(:,7) <= t50;
         half1mat = mat3(logi,:);
-        onHalf1cell3{i} = dropout(half1mat);
+%         onHalf1cell3{i} = dropout(half1mat);
+        onHalf1cell3{i} = (half1mat);
         % rep4:
         mat4 = centerCia4{i};
         L = size(mat4,1);
@@ -878,35 +914,57 @@ for i = constructs
         t50 = ts(floor(L*split));
         logi = mat4(:,7) <= t50;
         half1mat = mat4(logi,:);
-        onHalf1cell4{i} = dropout(half1mat);
-        
-        [out,p] = frequency_dwellFli2(onHalf1cell1{i},onHalf1cell2{i},onHalf1cell3{i},onHalf1cell4{i},timestep,colr{i},fignum,[0.9 0.01 0.001],[]);
+%         onHalf1cell4{i} = dropout(half1mat);
+        onHalf1cell4{i} = (half1mat);
+        % for ferquency:
+% %         [out,p] = frequency_dwellFli2(onHalf1cell1{i},onHalf1cell2{i},onHalf1cell3{i},onHalf1cell4{i},timestep,colr{i},fignum,inarg,[]);
+%         out = frequency_dwellFli5(onHalf1cell1{i},onHalf1cell2{i},onHalf1cell3{i},onHalf1cell4{i},timestep,colr{i},fignum,inarg,[]); % use this for freq
+% %         expLengthMatEarly(i,:) = out.expLength;
+        % for survival
+        [out,p] = survivalPlotFromVector([onHalf1cell1{i};onHalf1cell2{i};onHalf1cell3{i};onHalf1cell4{i}],6,2,1,3600,fignum,inarg,colr{i}); %
+        set(p,'Color',colr{i});
     catch
-        [out,p] = frequency_dwellFli2(onHalf1cell1{i},onHalf1cell2{i},timestep,colr{i},fignum,[0.9 0.01 0.001],[]);
+        % for ferquency:
+% %         [out,p] = frequency_dwellFli2(onHalf1cell1{i},onHalf1cell2{i},timestep,colr{i},fignum,inarg,[]);
+%         out = frequency_dwellFli5(onHalf1cell1{i},onHalf1cell2{i},timestep,colr{i},fignum,inarg,[]); % use this for freq
+% %         expLengthMatEarly(i,:) = out.expLength; 
+        % for survival
+        [out,p] = survivalPlotFromVector([onHalf1cell1{i};onHalf1cell2{i}],6,2,1,3600,fignum,inarg,colr{i}); %
+        set(p,'Color',colr{i});
     end
     activationParamsCenterDropoutEarly(i,:) = [out.a out.k1 out.k2];
-    freqCenterDropoutEarly(i) = 1/out.totalFrequency;
-    eventNumberCenterDropoutEarly(i) = out.eventNumber;
-    lowTimeCenterDropoutEarly(i) = out.lowTimes;
+    % for frequency:
+%     freqCenterDropoutEarly(i) = 1/out.totalFrequency;
+%     eventNumberCenterDropoutEarly(i) = out.eventNumber;
+%     lowTimeCenterDropoutEarly(i) = out.lowTimes;
     hold on
     if flag == 1
         try
-            [~,pbs] = bootstrapsFrequency([onHalf1cell1{i};onHalf1cell2{i};onHalf1cell3{i};onHalf1cell4{i}],6,10000,freqCenterDropoutEarly(i),colr{i},fignum);
+            % frequency:
+%             [~,pbs] = bootstrapsFrequency([onHalf1cell1{i};onHalf1cell2{i};onHalf1cell3{i};onHalf1cell4{i}],6,numOfBS,freqCenterDropoutEarly(i),colr{i},fignum);
+            % survival:
+            [~,pbs] = bootstrapsBootstraps([onHalf1cell1{i};onHalf1cell2{i};onHalf1cell3{i};onHalf1cell4{i}],6,numOfBS,colr{i},fignum);
         catch
-            [~,pbs] = bootstrapsFrequency([onHalf1cell1{i};onHalf1cell2{i}],6,10000,freqCenterDropoutEarly(i),colr{i},fignum);
+            % fdrequency:
+%             [~,pbs] = bootstrapsFrequency([onHalf1cell1{i};onHalf1cell2{i}],6,numOfBS,freqCenterDropoutEarly(i),colr{i},fignum);
+            % survial:
+            [~,pbs] = bootstrapsBootstraps([onHalf1cell1{i};onHalf1cell2{i}],6,numOfBS,colr{i},fignum);
         end
         hold on
     end
 end
-%plot stuff:
-% set(gca,'YLim',[2e-4 2.5e-2],'XLim',[0 2400]); % neutral & wt
-set(gca,'YLim',[2e-4 0.06],'XLim',[0 2400]); % all cndns
+% For freque3ncy:
+% set(gca,'YLim',[2e-4 0.05],'XLim',[0 2300]); % all cndns
+% for survival:
+set(gca,'Box',true,'FontSize',16,'YLim',[-4.8 0],'XLim',[0 2300]);
 
 %% save
-fp = 'C:\Users\thard\Dropbox\hardenTFfunction2020\figures\figs\';
-saveas(gca,[fp 'survFreqCurveFit&errEarly211014'],'svg'); %saved with 10000 BSs
+fp = 'C:\Users\tth12\Dropbox\hardenTFfunction2020\figures\figs\';
+% saveas(gca,[fp 'survFreqCurveFit&errEarly211014'],'svg'); %saved with 10000 BSs
+% saveas(gca,[fp 'survFreqCurveFit&errEarly220401'],'svg'); %this is with dropouts
+saveas(gca,[fp 'survFreqCurveFit&errEarly220412'],'svg'); % the survival version
 
-%% error surv Freq, EARLY, center, w/o dropouts
+%% error surv Freq, EARLY, center, Fig. 3C
 fitParams = [1 3600 0.9 0.01 0.001]; %[tm tx a k1 k2]
 bsNum = 10000;
 % parpool
@@ -920,8 +978,8 @@ for i = 1:5
     catch
         mat = [onHalf1cell1{i}; onHalf1cell2{i}];
     end
-    activeCenterEarlyFitsTaus{i} = bootstrapsBootstrapsFitTaus(mat,6,bsNum,2,fitParams);
-    activationParamsCenterDropoutEarlyStdTaus1000(i,:) = activeCenterEarlyFitsTaus{i}.std;
+%     activeCenterEarlyFitsTaus{i} = bootstrapsBootstrapsFitTaus(mat,6,bsNum,2,fitParams);
+%     activationParamsCenterDropoutEarlyStdTaus1000(i,:) = activeCenterEarlyFitsTaus{i}.std;
     activeCenterEarlyFits{i} = bootstrapsBootstrapsFit(mat,6,bsNum,2,fitParams);
     activationParamsCenterDropoutEarlyStd1000(i,:) = activeCenterEarlyFits{i}.std;
 end
@@ -930,7 +988,7 @@ toc
 %% save the Bootstraps:
 save C:\Users\thard\Dropbox\matlab\data\freqSurvEarlyErrs211015.dat activeCenterEarlyFitsTaus activationParamsCenterDropoutEarlyStdTaus1000 activeCenterEarlyFits activationParamsCenterDropoutEarlyStd1000
 
-%% table surv Freq, EARLY, center, w/o dropouts
+%% table surv Freq, EARLY, center, TABLE 2
 Reporter = tits';
 % rates:
 % allocate:
@@ -953,9 +1011,9 @@ Et2 = 1./Ek2;
 Et1err = round(1./Ek1.^2.*Ek1err);
 Et2err = round(1./Ek2.^2.*Ek2err,-1);
 %slight adjustment, bc a couple of the errors are a bit crazy, and if we fit instead using taus they become reasonable:
-Et1err(1) = round(activationParamsCenterDropoutEarlyStdTaus1000(1,2));
-Et1err(3) = round(activationParamsCenterDropoutEarlyStdTaus1000(3,2),-1);
-Et2err(4) = round(activationParamsCenterDropoutEarlyStdTaus1000(4,3),-1);
+% Et1err(1) = round(activationParamsCenterDropoutEarlyStdTaus1000(1,2));
+% Et1err(3) = round(activationParamsCenterDropoutEarlyStdTaus1000(3,2),-1);
+% Et2err(4) = round(activationParamsCenterDropoutEarlyStdTaus1000(4,3),-1);
 % b/c we call the tau1 of neutral the tau2:
 Et2(1) = Et1(1);Et2err(1) = Et1err(1);EA(1) = 0;
 % round
@@ -965,14 +1023,14 @@ activeParamsCenterDropoutEarly = table(Reporter,EA,EAerr,Et1,Et1err,Et2,Et2err)
 
 % 211015 updated these numbers hardenVincentDepace2021tablesV3
 
-%% bar chart. active params. EARLY, center, no dropout
+%% bar chart. active params. EARLY, center Fig. 3C
 ax229 = figure(229);
 bar(1,EA(1),0.4,'FaceColor',colr{1},'EdgeColor','none'); %initiate the bar chart first
 for i = 2:5
     hold on; bar(i,EA(i),0.4,'FaceColor',colr{i},'EdgeColor','none');
 end
 xticks([1 2 3 4 5]);
-set(gca,'xticklabels',tits(1:5),'yLim',[0 0.8],'Box',true,'FontSize',16,'xLim',[0.5 5.5]);
+set(gca,'xticklabels',tits(1:5),'yLim',[0 1],'Box',true,'FontSize',16,'xLim',[0.5 5.5]);
 xticklabel_rotate([],45,[],'FontSize',16);
 hold on;
 er = errorbar(1,EA(1),EAerr(1),EAerr(1));
@@ -992,7 +1050,7 @@ for i = 2:5
     hold on; bar(i,Et1(i),0.4,'FaceColor',colr{i},'EdgeColor','none');
 end
 xticks([1 2 3 4 5]);
-set(gca,'xticklabels',tits(1:5),'yLim',[0 250],'Box',true,'FontSize',16,'xLim',[0.5 5.5]);
+set(gca,'xticklabels',tits(1:5),'yLim',[0 60],'Box',true,'FontSize',16,'xLim',[0.5 5.5]);
 xticklabel_rotate([],45,[],'FontSize',16);
 hold on;
 er = errorbar(1,Et1(1),Et1err(1),Et1err(1));
@@ -1026,20 +1084,25 @@ for i = 2:5
 end
 set(gca,'Box',true); 
 %% save bar charts
-fp = 'C:\Users\thard\Dropbox\hardenTFfunction2020\figures\figs\';
-saveas(ax229,[fp 'freqBarAsEarly211015'],'svg');
-saveas(ax230,[fp 'freqBarTau1Early211015'],'svg');
-saveas(ax231,[fp 'freqBarTau2Early211015'],'svg');
+fp = 'C:\Users\tth12\Dropbox\hardenTFfunction2020\figures\figs\';
+% saveas(ax229,[fp 'freqBarAsEarly211015'],'svg');
+% saveas(ax230,[fp 'freqBarTau1Early211015'],'svg');
+% saveas(ax231,[fp 'freqBarTau2Early211015'],'svg');
+saveas(ax229,[fp 'freqBarAsEarly220401'],'svg'); % include dropouts
+saveas(ax230,[fp 'freqBarTau1Early220401'],'svg');
+saveas(ax231,[fp 'freqBarTau2Early220401'],'svg');
 
-%% surv Freq, LATE, center, w/o dropouts
+%% active TRXN surv, LATE, center, (SFig. 7)
 fignum = 35;
+inarg = [0.9 0.01 0.001];
+numOfBS = 10000;
 split = 1/5;timestep = 15;
 onHalf2cell1 = {};onHalf2cell2 = {};onHalf2cell3 = {};onHalf2cell4 = {};onLateParamsCell = {};
-activationParamsCenterDropoutLate = zeros(5,3);
+activationParamsCenterLate = zeros(5,3);
 freqCenterDropoutLate = zeros(5,1);
 eventNumberCenterDropoutLate = zeros(5,1);
 lowTimeCenterDropoutLate = zeros(5,1);
-flag = 0; 
+flag = 1; 
 for i = 1:5
     % treat each rep indie:
     mat1 = centerCia1{i};
@@ -1048,7 +1111,8 @@ for i = 1:5
     t50 = ts(floor(L*split));
     logi = mat1(:,7) > t50;
     half2mat = mat1(logi,:);
-    onHalf2cell1{i} = dropout(half2mat);
+%     onHalf2cell1{i} = dropout(half2mat);
+    onHalf2cell1{i} = (half2mat);
     % the other rep:
     mat2 = centerCia2{i};
     L = size(mat2,1);
@@ -1056,7 +1120,8 @@ for i = 1:5
     t50 = ts(floor(L*split));
     logi = mat2(:,7) > t50;
     half2mat = mat2(logi,:);
-    onHalf2cell2{i} = dropout(half2mat);
+%     onHalf2cell2{i} = dropout(half2mat);
+    onHalf2cell2{i} = (half2mat);
     try
         % treat each rep indie:
         mat3 = centerCia3{i};
@@ -1065,7 +1130,8 @@ for i = 1:5
         t50 = ts(floor(L*split));
         logi = mat3(:,7) > t50;
         half2mat = mat3(logi,:);
-        onHalf2cell3{i} = dropout(half2mat);
+%         onHalf2cell3{i} = dropout(half2mat);
+        onHalf2cell3{i} = (half2mat);
         % the other rep:
         mat4 = centerCia4{i};
         L = size(mat4,1);
@@ -1073,32 +1139,50 @@ for i = 1:5
         t50 = ts(floor(L*split));
         logi = mat4(:,7) > t50;
         half2mat = mat4(logi,:);
-        onHalf2cell4{i} = dropout(half2mat);
-        [out,p] = frequency_dwellFli3(onHalf2cell1{i},onHalf2cell2{i},onHalf2cell3{i},onHalf2cell4{i},timestep,colr{i},fignum,[0.9 0.01 0.001],[]);
+%         onHalf2cell4{i} = dropout(half2mat);
+        onHalf2cell4{i} = (half2mat);
+        % frequency:
+%         [out,p] = frequency_dwellFli5(onHalf2cell1{i},onHalf2cell2{i},onHalf2cell3{i},onHalf2cell4{i},timestep,colr{i},fignum,inarg,[]);
+        % for survival:
+        [out,p] = survivalPlotFromVector([onHalf2cell1{i};onHalf2cell2{i};onHalf2cell3{i};onHalf2cell4{i}],6,2,1,3600,fignum,inarg,colr{i}); %
     catch
-        [out,p] = frequency_dwellFli3(onHalf2cell1{i},onHalf2cell2{i},timestep,colr{i},fignum,[0.9 0.01 0.001],[]);
-   %     [out,p] = frequency_dwellFli2(offHalf2cell1{i},offHalf2cell2{i},timestep,colr{i},fignum,[0.9 0.01 0.001],meanExpLength);
+        % frequency:
+%         [out,p] = frequency_dwellFli5(onHalf2cell1{i},onHalf2cell2{i},timestep,colr{i},fignum,inarg,[]);
+        % for survival:
+        [out,p] = survivalPlotFromVector([onHalf2cell1{i};onHalf2cell2{i}],6,2,1,3600,fignum,inarg,colr{i}); %
     end
-    activationParamsCenterDropoutLate(i,:) = [out.a out.k1 out.k2];
-    freqCenterDropoutLate(i) = 1/out.totalFrequency;
-    eventNumberCenterDropoutLate(i) = out.eventNumber;
-    lowTimeCenterDropoutLate(i) = out.lowTimes;
+    activationParamsCenterLate(i,:) = [out.a out.k1 out.k2];
+    % frequency:
+%     freqCenterDropoutLate(i) = 1/out.totalFrequency;
+%     eventNumberCenterDropoutLate(i) = out.eventNumber;
+%     lowTimeCenterDropoutLate(i) = out.lowTimes;
     hold on
     set(p,'Color',colr{i});
     if flag == 1
         try
-            [~,pbs] = bootstrapsFrequency([onHalf2cell1{i};onHalf2cell2{i};onHalf2cell3{i};onHalf2cell4{i}],6,10000,freqCenterDropoutLate(i),colr{i},fignum);
+            % frequency:
+%             [~,pbs] = bootstrapsFrequency([onHalf2cell1{i};onHalf2cell2{i};onHalf2cell3{i};onHalf2cell4{i}],6,numOfBS,freqCenterDropoutLate(i),colr{i},fignum);
+            % survival:
+            [~,pbs] = bootstrapsBootstraps([onHalf2cell1{i};onHalf2cell2{i};onHalf2cell3{i};onHalf2cell4{i}],6,numOfBS,colr{i},fignum);
         catch
-            [~,pbs] = bootstrapsFrequency([onHalf2cell1{i};onHalf2cell2{i}],6,10000,freqCenterDropoutLate(i),colr{i},fignum);
+            % frequency:
+%             [~,pbs] = bootstrapsFrequency([onHalf2cell1{i};onHalf2cell2{i}],6,numOfBS,freqCenterDropoutLate(i),colr{i},fignum);
+            % survial:
+            [~,pbs] = bootstrapsBootstraps([onHalf2cell1{i};onHalf2cell2{i}],6,numOfBS,colr{i},fignum);
         end
         hold on
     end
 end
-set(gca,'YLim',[1.0e-5 0.006],'XLim',[0 1700]); % all cndns
+% frequency:
+% set(gca,'YLim',[1.0e-5 0.02],'XLim',[0 1700]); % all cndns
+% for survival:
+set(gca,'Box',true,'FontSize',16,'YLim',[-6.05 0],'XLim',[0 1700]);
 %% save
-fp = 'C:\Users\thard\Dropbox\hardenTFfunction2020\figures\figs\';
-saveas(gca,[fp 'survFreqCurveFit&errLate211014'],'svg'); %saved with 10000 BSs
-%% error surv Freq, LATE, center, w/o dropouts
+fp = 'C:\Users\tth12\Dropbox\hardenTFfunction2020\figures\figs\';
+% saveas(gca,[fp 'survFreqCurveFit&errLate220328'],'svg'); %saved with 10000 BSs
+% saveas(gca,[fp 'survFreqCurveFit&errLate220401'],'svg'); % frequency with dropouts
+saveas(gca,[fp 'survFreqCurveFit&errLate220413'],'svg'); % survival curves
+%% error surv Freq, LATE, center, SFIg. 7
 fitParams = [1 3600 0.9 0.01 0.001]; %[tm tx a k1 k2]
 bsNum = 10000;
 % parpool
@@ -1121,9 +1205,9 @@ end
 toc
 
 %% save the Bootstraps:
-save C:\Users\thard\Dropbox\matlab\data\freqSurvLateErrs211018.dat activeCenterLateFitsTaus activationParamsCenterDropoutLateStdTaus1000 activeCenterLateFits activationParamsCenterDropoutLateStd1000
+save C:\Users\thard\Dropbox\matlab\data\freqSurvLateErrs220328.dat activeCenterLateFitsTaus activationParamsCenterDropoutLateStdTaus1000 activeCenterLateFits activationParamsCenterDropoutLateStd1000
 
-%% table. active params. LATE, center, no dropout 
+%% table. active params. LATE, center, TABLE 2
 % set up table
 Reporter = tits';
 % rates:
@@ -1152,113 +1236,7 @@ t2 = round(t2,-1);
 activeParamsCenterDropoutLate = table(Reporter,A,Aerr,t1,t1err,t2,t2err)
 % saved to hardenVincentDepace2021tablesV3 on 211018
 
-%% event frequwncies, center, dropout:
-% define some terms: 
-% 1. event count: eventNumberCenterDropout
-% 2. total low time: lowTimeCenterDropout
-Reporter = tits';
-% counting error:
-eventErr = sqrt(eventNumberCenterDropout); 
-% frequencies:
-f = round(eventNumberCenterDropout./lowTimeCenterDropout,4);
-% error:
-ferr = round(eventErr./lowTimeCenterDropout,4);
-% period: 
-T = round(freqCenterDropout,-1);
-% error
-Terr = round(lowTimeCenterDropout./eventNumberCenterDropout.^2.*eventErr,-1);
-freqCenterDropoutTable = table(Reporter,f,ferr,T,Terr)
-%% bar
-ax220 = figure(220);
-bar(1,T(1),0.4,'FaceColor',colr{1},'EdgeColor','none'); %initiate the bar chart first
-for i = 2:5
-    hold on; bar(i,T(i),0.4,'FaceColor',colr{i},'EdgeColor','none');
-end
-xticks([1 2 3 4 5]);
-set(gca,'xticklabels',tits(1:5),'yLim',[0 450],'Box',true,'FontSize',16,'xLim',[0.5 5.5]);
-xticklabel_rotate([],45,[],'FontSize',16);
-hold on;
-er = errorbar(1,T(1),Terr(1),Terr(1));
-er.Color = colr{2};    %make the black neutral grey                       
-er.LineStyle = 'none'; 
-for i = 2:5
-    hold on;
-    er = errorbar(i,T(i),Terr(i),Terr(i));
-    er.Color = colr{1};    % make all err bars black                       
-    er.LineStyle = 'none'; 
-end
-set(gca,'Box',true);
-%% save bar
-fp = 'C:\Users\thard\Dropbox\hardenTFfunction2020\figures\figs\';
-saveas(ax220,[fp 'periodBar211018'],'svg');
-
-%% event frequencies, center, dropout, time btwn events
-% here we omit the time after the lacst active trxn event
-activationParamsCenterDropout = zeros(5,3);
-freqCenterDropout = zeros(5,1);
-eventNumberCenterDropout = zeros(5,1);
-lowTimeCenterDropout = zeros(5,1);
-expLengthMat = zeros(5,4);
-meanExpLength = 3.2730e+03; % I got this from averaging all ten exp lengths computed in frequency_dwellFli2
-for i = 1:5
-%     out = frequency_dwellFli3(dropout(centerCia1{i}),dropout(centerCia2{i}),timestep,colr{i},fignum,[0.9 0.01 0.001],[]); % 
-%     expLengthMat(i,1:2) = out.expLength;
-    try
-        out = frequency_dwellFli3(dropout(centerCia1{i}),dropout(centerCia2{i}),dropout(centerCia3{i}),dropout(centerCia4{i}),timestep,colr{i},fignum,[0.9 0.01 0.001],[]); % 
-            expLengthMat(i,:) = out.expLength;
-    catch
-        out = frequency_dwellFli3(dropout(centerCia1{i}),dropout(centerCia2{i}),timestep,colr{i},fignum,[0.9 0.01 0.001],[]); % 
-        expLengthMat(i,1:2) = out.expLength;
-    end
-    activationParamsCenterDropout(i,:) = [out.a out.k1 out.k2];
-    freqCenterDropout(i) = 1/out.totalFrequency;
-    eventNumberCenterDropout(i) = out.eventNumber;
-    lowTimeCenterDropout(i) = out.lowTimes;
-end
-
-%% event frequencies, center, dropout EARLY
-eventErrEarly = sqrt(eventNumberCenterDropoutEarly); 
-earlyf = round(eventNumberCenterDropoutEarly./lowTimeCenterDropoutEarly,3);
-earlyferr = round(eventErrEarly./lowTimeCenterDropoutEarly,3);
-earlyT = round(freqCenterDropoutEarly);
-earlyTerr = round(lowTimeCenterDropoutEarly./eventNumberCenterDropoutEarly.^2.*eventErrEarly);
-freqCenterDropoutTableEarly = table(Reporter,earlyf,earlyferr,earlyT,earlyTerr)
-%% bar
-ax221 = figure(221);
-bar(1,earlyT(1),0.4,'FaceColor',colr{1},'EdgeColor','none'); %initiate the bar chart first
-for i = 2:5
-    hold on; bar(i,earlyT(i),0.4,'FaceColor',colr{i},'EdgeColor','none');
-end
-xticks([1 2 3 4 5]);
-set(gca,'xticklabels',tits(1:5),'yLim',[0 80],'Box',true,'FontSize',16,'xLim',[0.5 5.5]);
-xticklabel_rotate([],45,[],'FontSize',16);
-hold on;
-er = errorbar(1,earlyT(1),earlyTerr(1),earlyTerr(1));
-er.Color = colr{2};    %make the black neutral grey                       
-er.LineStyle = 'none'; 
-for i = 2:5
-    hold on;
-    er = errorbar(i,earlyT(i),earlyTerr(i),earlyTerr(i));
-    er.Color = colr{1};    % make all err bars black                       
-    er.LineStyle = 'none'; 
-end
-set(gca,'Box',true);
-%% save bar
-fp = 'C:\Users\thard\Dropbox\hardenTFfunction2020\figures\figs\';
-saveas(ax221,[fp 'periodBarEarly211018'],'svg');
-
-%% event frequencies, center, dropout LATE
-eventErrLate = sqrt(eventNumberCenterDropoutLate); 
-latef = round(eventNumberCenterDropoutLate./lowTimeCenterDropoutLate,4);
-lateferr = round(eventErrLate./lowTimeCenterDropoutLate,4);
-lateT = round(freqCenterDropoutLate,-1);
-lateTerr = round(lowTimeCenterDropoutLate./eventNumberCenterDropoutLate.^2.*eventErrLate,-1);
-freqCenterDropoutTableLate = table(Reporter,latef,lateferr,lateT,lateTerr)
-
-%%%%%%%%%% updated all idle frequency bar charts and table 211018
-
-
-%% SMfig2: comparing replicates -- spots v time
+%% comparing replicates -- spots v time (unused)
 %Importantly, here we normalize by the median number of nukes in all
 %experiments. Run the nukes binning section for that
 % neutral:
@@ -1379,7 +1357,7 @@ saveas(ax34,[fp 'trxnProfileReplicatesDst211108'],'svg');
 
 % On biological replicates:
 
-%% KS test btwn replicates for on frames, center nukes, no dropout:
+%% KS test btwn replicates for on frames, center nukes:
 % order: neutral, wt space, zld, bcd, stat
 for i = 2:5
     m1 = dropout(centerCia1{i});m2 = dropout(centerCia2{i});
@@ -1433,7 +1411,7 @@ m1 = dropout(centerCia1{1});m2 = dropout(centerCia2{1});m3 = dropout(centerCia3{
 [h,p] = kstest2(m3(:,5),[m1(:,5);m2(:,5);m4(:,5)])
 [h,p] = kstest2(m4(:,5),[m1(:,5);m2(:,5);m3(:,5)]) 
 
-%% first passage time by replicate:
+%% first passage time by replicate (SFig. 4A):
 % neutral:
 % plot data first:
 fignum = 117;
@@ -1483,8 +1461,7 @@ toc
 %% saved so you dont ahve to run again:
 % save C:\Users\thard\Dropbox\matlab\data\t1p54n.dat nFitErrStruc nBsCell
 save C:\Users\thard\Dropbox\matlab\data\t1p54n.dat nFitErrStruc nBsCell -append
-%%
-% plot neutral bootstraps
+%% plot neutral bootstraps
 fignum = 118; 
 ax118 = figure(fignum);
 % load C:\Users\thard\Dropbox\matlab\data\t1p54n1.dat -mat 
@@ -1594,8 +1571,8 @@ for i = 1:repNum
     hold on;plot(xs,gCDF,'--','LineWidth',0.5,'Color',colr{1} + (i - 1)*0.5,'LineWidth',1);shg
 end
 %% save
-fp = 'C:\Users\thard\Dropbox\hardenTFfunction2020\figures\figs\';
-saveas(ax121,[fp 'fpReplicatesZld211111'],'svg');
+fp = 'C:\Users\tth12\Dropbox\hardenTFfunction2020\figures\figs\';
+saveas(ax121,[fp 'fpReplicatesZld220329'],'svg');
 %% zld rep first bind BS
 % generate bootstraps
 bs = 10000; 
@@ -1612,7 +1589,7 @@ zldFitErrStruc = firstEventBootstrapFitter3(zldBsCell,inarg);
 toc
 
 %% saved so you dont ahve to run again:
-save C:\Users\thard\Dropbox\matlab\data\t1p54n.dat zldFitErrStruc zldBsCell -append
+save C:\Users\tth12\Dropbox\matlab\data\t1p54n.dat zldFitErrStruc zldBsCell -append
 %%
 % plot zld bootstraps
 fignum = 122; 
@@ -1628,8 +1605,8 @@ set(gca,'YLim',[0 1.01],'Xlim',[0 4000],'Box',true,'FontSize',16);
 % xlabel('Time (s)')
 toc;
 %% save 
-fp = 'C:\Users\thard\Dropbox\hardenTFfunction2020\figures\figs\';
-saveas(ax122,[fp 'fpReplicatesZldBS211111'],'svg');
+fp = 'C:\Users\tth12\Dropbox\hardenTFfunction2020\figures\figs\';
+saveas(ax122,[fp 'fpReplicatesZldBS220329'],'svg');
 % done 211112
 
 %% bcd:
@@ -1765,93 +1742,113 @@ saveas(ax126,[fp 'fpReplicatesdBS211111'],'svg');
 
 %% active trxn time by replicate (SFig. 4):
 %  neutral: with the fit parameters
-fignum = 131;
+fignum = 130;
 ciaCell = nCenterCia;
 repNum = 4;
 numBS = 10000;
 flag = 1;
 for i = 1:repNum
-    [~,p] = survivalPlotFromVector(dropout(ciaCell{i}),6,0,1,3600,fignum + 1); % no fit
+%     [~,p] = survivalPlotFromVector(dropout(ciaCell{i}),6,0,1,3600,fignum + 1); % no fit
+    [~,p] = survivalPlotFromVector((ciaCell{i}),6,0,1,3600,fignum + 1); % no fit
     set(p,'Color',colr{1} + i*0.2);
     hold on
     if flag == 1
-        bootstrapsBootstraps(dropout(ciaCell{i}),6,numBS,colr{1} + i*0.2,fignum + 1);
+%         bootstrapsBootstraps(dropout(ciaCell{i}),6,numBS,colr{1} + i*0.2,fignum + 1);
+        bootstrapsBootstraps((ciaCell{i}),6,numBS,colr{1} + i*0.2,fignum + 1);
         hold on
     end
 end
 set(gca,'Box',true,'FontSize',16,'YLim',[-6 0],'XLim',[0 2500]);
+% -4.3, 600
 % space:  with the fit parameters
-fignum = 132;
+fignum = 131;
 ciaCell = spaceCenterCia;
 repNum = 2;
-numBS = 1000;
+numBS = 10000;
 flag = 1;
 for i = 1:repNum
-    [~,p] = survivalPlotFromVector(dropout(ciaCell{i}),6,0,1,3600,fignum + 1); % no fit
+%     [~,p] = survivalPlotFromVector(dropout(ciaCell{i}),6,0,1,3600,fignum + 1); % no fit
+    [~,p] = survivalPlotFromVector((ciaCell{i}),6,0,1,3600,fignum + 1); % no fit
     set(p,'Color',colr{i});
     hold on
     if flag == 1
-        bootstrapsBootstraps(dropout(ciaCell{i}),6,numBS,colr{i},fignum + 1);
+%         bootstrapsBootstraps(dropout(ciaCell{i}),6,numBS,colr{i},fignum + 1);
+        bootstrapsBootstraps((ciaCell{i}),6,numBS,colr{i},fignum + 1);
         hold on
     end
 end
 set(gca,'Box',true,'FontSize',16,'YLim',[-6 0],'XLim',[0 2500]);
+% -6, 2500
 % zld:
-fignum = 133;
+fignum = 132;
 ciaCell = zldCenterCia;
 repNum = 2;
-numBS = 1000;
+numBS = 10000;
 flag = 1;
 for i = 1:repNum
-    [~,p] = survivalPlotFromVector(dropout(ciaCell{i}),6,0,1,3600,fignum + 1); % no fit
+%     [~,p] = survivalPlotFromVector(dropout(ciaCell{i}),6,0,1,3600,fignum + 1); % no fit
+    [~,p] = survivalPlotFromVector((ciaCell{i}),6,0,1,3600,fignum + 1); % no fit
     set(p,'Color',colr{i});
     hold on
     if flag == 1
-        bootstrapsBootstraps(dropout(ciaCell{i}),6,numBS,colr{i},fignum + 1);
+%         bootstrapsBootstraps(dropout(ciaCell{i}),6,numBS,colr{i},fignum + 1);
+        bootstrapsBootstraps((ciaCell{i}),6,numBS,colr{i},fignum + 1);
         hold on
     end
 end
 set(gca,'Box',true,'FontSize',16,'YLim',[-6 0],'XLim',[0 2500]);
-
+% -5.3; 1800
 % bcd:
-fignum = 134;
+fignum = 133;
 ciaCell = bcdCenterCia;
 repNum = 2;
-numBS = 1000;
+numBS = 10000;
 flag = 1;
 for i = 1:repNum
-    [~,p] = survivalPlotFromVector(dropout(ciaCell{i}),6,0,1,3600,fignum + 1); % no fit
+%     [~,p] = survivalPlotFromVector(dropout(ciaCell{i}),6,0,1,3600,fignum + 1); % no fit
+    [~,p] = survivalPlotFromVector((ciaCell{i}),6,0,1,3600,fignum + 1); % no fit
     set(p,'Color',colr{i});
     hold on
     if flag == 1
-        bootstrapsBootstraps(dropout(ciaCell{i}),6,numBS,colr{i},fignum + 1);
+%         bootstrapsBootstraps(dropout(ciaCell{i}),6,numBS,colr{i},fignum + 1);
+        bootstrapsBootstraps((ciaCell{i}),6,numBS,colr{i},fignum + 1);
         hold on
     end
 end
 set(gca,'Box',true,'FontSize',16,'YLim',[-6 0],'XLim',[0 2500]);
+% -5; 900
 % dstat:
-fignum = 135;
+fignum = 134;
 ciaCell = dCenterCia;
 repNum = 2;
-numBS = 1000;
+numBS = 10000;
 flag = 1;
 for i = 1:repNum
-    [~,p] = survivalPlotFromVector(dropout(ciaCell{i}),6,0,1,3600,fignum + 1); % no fit
+%     [~,p] = survivalPlotFromVector(dropout(ciaCell{i}),6,0,1,3600,fignum + 1); % no fit
+    [~,p] = survivalPlotFromVector((ciaCell{i}),6,0,1,3600,fignum + 1); % no fit
     set(p,'Color',colr{i});
     hold on
     if flag == 1
-        bootstrapsBootstraps(dropout(ciaCell{i}),6,numBS,colr{i},fignum + 1);
+%         bootstrapsBootstraps(dropout(ciaCell{i}),6,numBS,colr{i},fignum + 1);
+        bootstrapsBootstraps((ciaCell{i}),6,numBS,colr{i},fignum + 1);
         hold on
     end
 end
 set(gca,'Box',true,'FontSize',16,'YLim',[-6 0],'XLim',[0 2500]);
-
+% -5.5; 2200
+%% save
+fp = 'C:\Users\tth12\Dropbox\hardenTFfunction2020\figures\figs\';
+figure(131);saveas(gca,[fp 'survCurveFit&errNeutralReps220502'],'svg');
+figure(132);saveas(gca,[fp 'survCurveFit&errWtReps220502'],'svg');
+figure(133);saveas(gca,[fp 'survCurveFit&errZldReps220502'],'svg');
+figure(134);saveas(gca,[fp 'survCurveFit&errBcdReps220502'],'svg');
+figure(135);saveas(gca,[fp 'survCurveFit&errDstReps220502'],'svg');
 %%  neutral with bootstraps 
 timestep = 15;
 fignum = 136;
 reps = 1:4;
 ciaCell = nCenterCia;
-bsNum = 1000;
+bsNum = 10000;
 % generate and plot the boot straps
 tic;
 for i = reps
@@ -1876,7 +1873,7 @@ fignum = 137;
 reps = 1:2;
 ciaCell = spaceCenterCia;
 cndnN = 2;
-bsNum = 1000;
+bsNum = 10000;
 % generate and plot the boot straps
 tic;
 for i = reps
@@ -1901,7 +1898,7 @@ fignum = 138;
 reps = 1:2;
 ciaCell = zldCenterCia;
 cndnN = 3;
-bsNum = 1000;
+bsNum = 10000;
 % generate and plot the boot straps
 tic;
 for i = reps
@@ -1926,7 +1923,7 @@ fignum = 139;
 reps = 1:2;
 ciaCell = bcdCenterCia;
 cndnN = 4;
-bsNum = 1000;
+bsNum = 10000;
 % generate and plot the boot straps
 tic;
 for i = reps
@@ -1951,7 +1948,7 @@ fignum = 140;
 reps = 1:2;
 ciaCell = dCenterCia;
 cndnN = 5;
-bsNum = 1000;
+bsNum = 10000;
 % generate and plot the boot straps
 tic;
 for i = reps
@@ -1977,7 +1974,7 @@ saveas(gca,[fp 'survFreqCurveFit&errStatReps211112'],'svg');
 
 % I have no idea why this works to create a manipuble vector figure and the
 % method for doing the same in FP times does not. 
-%% plotting the stripe center. SFig. 1
+%% plotting the stripe center. SFig. 3
 % you could normalize by totalBinMean from the nuke binning section at the
 % top of this script
 lim = [-0.2 0.25];
@@ -2036,7 +2033,7 @@ set(gca,'Box',true,'FontSize',16,'XLim',lim);
 ylabel(xName)
 xlabel('Position relative to stripe center (fraction of AP length)')
 
-% zld
+%% zld
 figNum = 22;
 anal1 = zldAnal1;
 anal2 = zldAnal2;
@@ -2057,7 +2054,7 @@ set(gca,'Box',true,'FontSize',16,'XLim',lim);
 ylabel(xName)
 xlabel('Position relative to stripe center (fraction of AP length)')
 
-% bcd
+%% bcd
 figNum = 23;
 anal1 = bcdAnal1;
 anal2 = bcdAnal2;
@@ -2106,11 +2103,11 @@ saveas(ax22,[fp 'spotPostionPDFZld'],'svg');
 saveas(ax23,[fp 'spotPostionPDFBcd'],'svg');
 saveas(ax24,[fp 'spotPostionPDFDst'],'svg');
 
-%% Single exp fits; SFig 3
+%% Single exp fits to surv freq; (unused)
 % surv Freq, center w/o dropouts
 timestep = 15;
 fignum = 40;
-activationParamsCenterDropout = zeros(5,3);
+activationParamsFreqSingle = zeros(5,2);
 freqCenterDropout = zeros(5,1);
 eventNumberCenterDropout = zeros(5,1);
 lowTimeCenterDropout = zeros(5,1);
@@ -2118,42 +2115,57 @@ expLengthMat = zeros(5,2);
 meanExpLength = 3.2730e+03; % I got this from averaging all ten exp lengths computed in frequency_dwellFli2
 for i = 1:5
     try 
-        out = frequency_dwellFli4(dropout(centerCia1{i}),dropout(centerCia2{i}),dropout(centerCia3{i}),dropout(centerCia4{i}),timestep,colr{i},fignum,[0.1]); % 30
+%         out = frequency_dwellFli4(dropout(centerCia1{i}),dropout(centerCia2{i}),dropout(centerCia3{i}),dropout(centerCia4{i}),timestep,colr{i},fignum,[0.1]); %
+        out = frequency_dwellFli4((centerCia1{i}),(centerCia2{i}),(centerCia3{i}),(centerCia4{i}),timestep,colr{i},fignum,[0.1]); % 
     catch
-        out = frequency_dwellFli4(dropout(centerCia1{i}),dropout(centerCia2{i}),timestep,colr{i},fignum,[0.1]); % 30
+%         out = frequency_dwellFli4(dropout(centerCia1{i}),dropout(centerCia2{i}),timestep,colr{i},fignum,[0.1]);
+        out = frequency_dwellFli4((centerCia1{i}),(centerCia2{i}),timestep,colr{i},fignum,[0.1]); % 30
     end
-%     [params,p] = survivalPlotFromVector(interEvents,1,1,1,3600,fignum,0.1) %5 for frames, 6 for times
-%     set(p,'Color',colr{i});
+    activationParamsFreqSingle(i,:) = [out.totalFrequency out.k1];
 end
-set(gca,'YLim',[7e-6 5e-3],'XLim',[0 2300]);
+set(gca,'YLim',[1e-5 1.5e-2],'XLim',[0 2300]);
+
+%% active trxn survival w/ single exp fit; SFig. 6
+fignum = 41;
+
+inarg = [0.1];
+activationParamsSingle = zeros(5,3);
+for i = 1:5
+    [out,p] = survivalPlotFromVector(centerCia{i},6,1,1,3600,fignum,inarg,colr{i}); %
+    set(p,'Color',colr{i});
+    activationParamsSingle(i,:) = [out.tConst out.k1 out.avg];
+    hold on;
+end
+set(gca,'Box',true,'FontSize',16,'YLim',[-6.5 0],'XLim',[0 2300]);
 %% save
-fp = 'C:\Users\thard\Dropbox\hardenTFfunction2020\figures\figs\';
-saveas(gca,[fp 'onTimesFreqAllSingleExpFit'],'svg');
+fp = 'C:\Users\tth12\Dropbox\hardenTFfunction2020\figures\figs\';
+% saveas(gca,[fp 'onTimesFreqAllSingleExpFit220329'],'svg');
+% saveas(gca,[fp 'onTimesFreqAllSingleExpFit220401'],'svg'); % with dropouts
+saveas(gca,[fp 'onTimesFreqAllSingleExpFit220413'],'svg'); % survival curves
 
 %% SFig 5 raster plots
-% make nuke cell arrays
-nukeCell{1} = nNukes;
-nukeCell{2} = spaceNukes;
-nukeCell{3} = zldNukes;
-nukeCell{4} = bcdNukes;
-nukeCell{5} = dNukes;
-figNum = 37;
-frames = [];
-for i = 1:5
-    out = rasterater3(nukeCell{i},[],0,figNum+i-1); %order: wt, zld, bcd, dStat
-    set(gca,'FontSize',16);
-    frames = [frames;out.finalFrame];
-end
+rasterater4(nAnal1,nAnal2,nAnal3,nAnal4,0,28);
+set(gca,'FontSize',16);
+rasterater4(spaceAnal1,spaceAnal2,0,29);
+set(gca,'FontSize',16);
+rasterater4(zldAnal1,zldAnal2,0,30);
+set(gca,'FontSize',16);
+rasterater4(bcdAnal1,bcdAnal2,0,31);
+set(gca,'FontSize',16);
+rasterater4(dAnal1,dAnal2,0,32);
+set(gca,'FontSize',16);
 %% save
+figNum = 28;
 axN = figure(figNum);axWT = figure(figNum + 1);axZld = figure(figNum + 2);axBcd = figure(figNum + 3);axDst = figure(figNum + 4);
-fp = 'C:\Users\thard\Dropbox\hardenTFfunction2020\figures\figs\';
-saveas(axN,[fp 'rasterN'],'svg');
-saveas(axWT,[fp 'rasterWT'],'svg');
-saveas(axZld,[fp 'rasterZld'],'svg');
-saveas(axBcd,[fp 'rasterBcd'],'svg');
-saveas(axDst,[fp 'rasterDst'],'svg');
+fp = 'C:\Users\tth12\Dropbox\hardenTFfunction2020\figures\figs\';
+saveas(axN,[fp 'rasterN2203'],'svg');
+saveas(axWT,[fp 'rasterWT2203'],'svg');
+saveas(axZld,[fp 'rasterZld2203'],'svg');
+saveas(axBcd,[fp 'rasterBcd2203'],'svg');
+saveas(axDst,[fp 'rasterDst2203'],'svg');
 
-%% single exp fits to 1st passage
+
+%% single exp fits to 1st passage SFig 5
 % fit time to 1st bind with LJF's scripts (set up):
 
 % see word doc in C:\Users\tth12\matlab\mFiles\timeToFirstBinding
@@ -2194,7 +2206,7 @@ saveas(axDst,[fp 'rasterDst'],'svg');
 % end
 %nonSpecific bind rate. set to zero for the moment. can control for this later
 rc = 0;
-%% fit time to 1st bind with LJF's scripts (plot)
+%% fit time to 1st bind with LJF's scripts (SFig. 5A)
 fignum = 67;
 NtV = zeros(1,5);
 NsV = zeros(1,5);
@@ -2242,7 +2254,7 @@ set(gca,'YLim',[0 1.01],'Xlim',[0 4000],'Box',true,'FontSize',16);
 ylabel('Fraction of nuclei')
 xlabel('Time (s)')
 
-% SFig 6: two equal step exp fits to 1st passage
+%% SFig 5B: two equal step exp fits to 1st passage
 % here we (thought) we did it right. This accounts for limited observation window and
 % active fraction of nukes. the rate doesn't change, even with changing
 % active fraction
@@ -2253,10 +2265,11 @@ fitInputs = [0.1 100];
 fitMat = [];
 % for i = [1 2 4 5] %TSing, WT as norm
 for i = 1:repNum
-    [fitParams,p,p2] = initialFraction7(ciaCell{i},nukeCell{i},norm,fitInputs,30,3000,fignum + 1);
+    [fitParams,p,p2] = initialFraction7(centerCia{i},nukeCell{i},NtV(i),fitInputs,30,3000,fignum + 1);
+    set(p2,'Color',colr{i});
+    fitMat = [fitMat;fitParams.Af fitParams.k0];
 %     [out,p] = initialFractionBin(analCell1{i},analCell2{i},bins,boiC,fitInputs,30,3000,fignum + 1);
     set(p,'Color',colr{i},'LineWidth',1);
-    fitMat = [fitMat;fitParams.Af fitParams.k0];
     hold on;
 end
 set(gca,'Box',true,'FontSize',16,'XLim',[0 4000],'YLim',[0 1.01]);
@@ -2265,84 +2278,10 @@ xlabel('Time (s)')
 %% save
 axOne = figure(fignum);axTwo = figure(fignum + 1);
 fp = 'C:\Users\thard\Dropbox\hardenTFfunction2020\figures\figs\';
-saveas(axOne,[fp 'firstPassageOneExpFit'],'svg');
-saveas(axTwo,[fp 'firstPassageTwoEqualExpFit'],'svg');
+saveas(axOne,[fp 'firstPassageOneExpFit220328'],'svg');
+saveas(axTwo,[fp 'firstPassageTwoEqualExpFit220328'],'svg');
 
-%% idle time distribution; center, including dropout, omit time after last event:
-%survival, not frequency dist.
-fignum = 72;
-for i = 1:5
-interEvents = idleSurvival(centerCia{i});
-% [params,p] = survivalPlotFromVector(interEvents,1,0,1,3600,fignum); % no fit
-[params,p] = survivalPlotFromVector(interEvents,1,2,1,3600,fignum,[0.8 0.01 0.001]); % dbl exp
-% [params,p] = survivalPlotFromVector(interEvents,1,1,1,3600,fignum,[0.1]); % single exp
-% b = params.a;u1 = params.k1;u2 = params.k2;
-set(p,'Color',colr{i});
-hold on
-end
-set(gca,'Box',true,'FontSize',16,'ylim',[-6 0]);
-% set(gca,'YScale','log');
-ylabel('Ln(probability of survival)')
-xlabel('Time (s)')
 
-%% idle time distribution; center, DO NOT include dropouts, omit time after last event:
-%survival, not frequency dist.
-fignum = 73;
-for i = 1:5
-interEvents = idleSurvival(dropout(centerCia{i}));
-[params,p] = survivalPlotFromVector(interEvents,1,0,1,3600,fignum); % no fit
-% [params,p] = survivalPlotFromVector(interEvents,1,2,1,3600,fignum,[0.8 0.01 0.001]); % dbl exp
-% [params,p] = survivalPlotFromVector(interEvents,1,1,1,3600,fignum,[0.1]); % single exp
-% b = params.a;u1 = params.k1;u2 = params.k2;
-set(p,'Color',colr{i});
-hold on
-end
-set(gca,'Box',true,'FontSize',16,'ylim',[-6 0]);
-% set(gca,'YScale','log');
-ylabel('Ln(probability of survival)')
-xlabel('Time (s)')
-
-%% idle time distribution; center, dropout, include time after last event:
-%survival, not frequency dist.
-fignum = 71;
-for i = 1:5
-interEventsStruc = idleSurvival2(centerCia{i});
-interEvents = [interEventsStruc.interEvents; interEventsStruc.endEvents];
-[params,p] = survivalPlotFromVector(interEvents,1,0,1,3600,fignum); % no fit
-% [params,p] = survivalPlotFromVector(interEvents,1,2,1,3600,fignum,[0.8 0.01 0.001]); % dbl exp
-% b = params.a;u1 = params.k1;u2 = params.k2;
-set(p,'Color',colr{i});
-hold on
-end
-set(gca,'Box',true,'FontSize',16);
-% set(gca,'YScale','log');
-ylabel('Ln(probability of survival)')
-xlabel('Time (s)')
-% off times doesn't work, as in it is unfittable, if we include the times
-% after the last event. So I think this may be useless. 
-
-%% SFig 5 raster plots
-% make nuke cell arrays
-nukeCell{1} = nNukes;
-nukeCell{2} = spaceNukes;
-nukeCell{3} = zldNukes;
-nukeCell{4} = bcdNukes;
-nukeCell{5} = dNukes;
-figNum = 37;
-frames = [];
-for i = 1:5
-    out = rasterater3(nukeCell{i},[],0,figNum+i-1); %order: wt, zld, bcd, dStat
-    set(gca,'FontSize',16);
-    frames = [frames;out.finalFrame];
-end
-%% save
-axN = figure(figNum);axWT = figure(figNum + 1);axZld = figure(figNum + 2);axBcd = figure(figNum + 3);axDst = figure(figNum + 4);
-fp = 'C:\Users\thard\Dropbox\hardenTFfunction2020\figures\figs\';
-saveas(axN,[fp 'rasterN'],'svg');
-saveas(axWT,[fp 'rasterWT'],'svg');
-saveas(axZld,[fp 'rasterZld'],'svg');
-saveas(axBcd,[fp 'rasterBcd'],'svg');
-saveas(axDst,[fp 'rasterDst'],'svg');
 
 
 

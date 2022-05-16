@@ -1,4 +1,5 @@
-% t1p54o: PBing data. Using the eve2:wt condition
+% to produce the image acquiosition conditions figure (i.e. SFig 1)
+% of Harden et al 2022
 
 %% initialize variables:
 % 1/30s exposure (2 Frame/min)
@@ -80,7 +81,17 @@ centerCia1{1} = binnedCiaMaker3(spaceAnal1,bins,boiC);
 centerCia2{1} = binnedCiaMaker3(spaceAnal2,bins,boiC);
 centerCia{3} = binnedCiaMaker3(space60anal,bins,boiC);
 
-%% spots v T (initial look)
+% idle cias:
+idleCia = {};idleCia1 = {};idleCia2 = {};
+for i = 1:3
+    idleCia{i} = idleCiaMaker2(centerCia{i},30);
+    try
+        idleCia1{i} = idleCiaMaker2(centerCia1{i},30);
+        idleCia2{i} = idleCiaMaker2(centerCia2{i},30);
+    end
+end
+
+%% spots v T (SFig. 1A)
 % 2 frame/min:
 figure(535);
 clear cia15dropout mat2 mn mx
@@ -136,233 +147,30 @@ set(gca,'Box',true,'FontSize',16,'xlim',[0 4500]);
 
 % NB: This plot looks as if there is no discernible PBing in these
 % conditions (a miracle), but there is a bump at about 30min (frame 2000)
-% in number of spots in the 1 frame/min condition. I don't think much of
-% this, but will surly raise eyebrows, so either go back to the analysis
-% and figure what happened, or don't use this plot. 
+% in number of spots in the 1 frame/min condition. 
 
-%% surv Freq of on times. All spots. w/o dropouts 
-% % initialize:
-% fignum = 531;
-% activationParamsDropout = zeros(3,3);
-% freqDropout = zeros(3,1);
-% eventNumberDropout = zeros(3,1);
-% lowTimeDropout = zeros(3,1);
-% expLengthMat = zeros(3,4);
-% meanExpLength = 3.2730e+03; % I got this from averaging all ten exp lengths computed in frequency_dwellFli2
-% 
-% % 4 frame/min:
-% timestep = 15; %using half of the acqn time
-% out = frequency_dwellFli3(dropout(space15cia),timestep,colr{1},fignum,[0.9 0.01 0.001],[]); % 
-% expLengthMat(1,1:2) = out.expLength;
-% activationParamsDropout(1,:) = [out.a out.k1 out.k2];
-% freqDropout(1) = 1/out.totalFrequency;
-% eventNumberDropout(1) = out.eventNumber;
-% lowTimeDropout(1) = out.lowTimes;
-% 
-% % 2 frame/min:
-% timestep = 30; %using half of the acqn time
-% hold on;
-% out = frequency_dwellFli3(dropout(spaceCia1),dropout(spaceCia2),timestep,colr{2},fignum,[0.9 0.01 0.001],[]); % 
-% expLengthMat(2,1:2) = out.expLength;
-% activationParamsDropout(2,:) = [out.a out.k1 out.k2];
-% freqDropout(2) = 1/out.totalFrequency;
-% eventNumberDropout(2) = out.eventNumber;
-% lowTimeDropout(2) = out.lowTimes;
-% 
-% % 1 frame/min:
-% timestep = 60; %using half of the acqn time
-% hold on;
-% out = frequency_dwellFli3(dropout(space60cia),timestep,colr{3},fignum,[0.9 0.01 0.001],[]); % 
-% expLengthMat(3,1:2) = out.expLength;
-% activationParamsDropout(3,:) = [out.a out.k1 out.k2];
-% freqDropout(3) = 1/out.totalFrequency;
-% eventNumberDropout(3) = out.eventNumber;
-% lowTimeDropout(3) = out.lowTimes;
-% set(gca,'YLim',[2e-6 3e-3],'XLim',[0 2300]);
-% 
-% % to do: include errors on this plot. Then make a PDF of the on times. 
-% 
-% %% surv Freq of active trxn times. All spots. w/ dropouts 
-% % as of 220204, we'll use the (other) data w/o dropouts for consistency
-% % initialize:
-% fignum = 532;
-% activationParamsCenter = zeros(3,3);
-% freqCenter = zeros(3,1);
-% eventNumberCenter = zeros(3,1);
-% lowTimeCenter = zeros(3,1);
-% expLengthMat = zeros(3,4);
-% meanExpLength = 3.2730e+03; % I got this from averaging all ten exp lengths computed in frequency_dwellFli2
-% 
-% % 4 frame/min:
-% timestep = 15; %using half of the acqn time
-% out = frequency_dwellFli3((space15cia),timestep,colr{1},fignum,[0.9 0.01 0.001],[]); % 
-% expLengthMat(1,1:2) = out.expLength;
-% activationParamsCenter(1,:) = [out.a out.k1 out.k2];
-% freqCenter(1) = 1/out.totalFrequency;
-% eventNumberCenter(1) = out.eventNumber;
-% lowTimeCenter(1) = out.lowTimes;
-% 
-% % 2 frame/min:
-% timestep = 30; %using half of the acqn time
-% hold on;
-% out = frequency_dwellFli3((spaceCia1),(spaceCia2),timestep,colr{2},fignum,[0.9 0.01 0.001],[]); % 
-% expLengthMat(2,1:2) = out.expLength;
-% activationParamsCenter(2,:) = [out.a out.k1 out.k2];
-% freqCenter(2) = 1/out.totalFrequency;
-% eventNumberCenter(2) = out.eventNumber;
-% lowTimeCenter(2) = out.lowTimes;
-% 
-% % 1 frame/min:
-% timestep = 60; %using half of the acqn time
-% hold on;
-% out = frequency_dwellFli3((space60cia),timestep,colr{3},fignum,[0.9 0.01 0.001],[]); % 
-% expLengthMat(3,1:2) = out.expLength;
-% activationParamsCenter(3,:) = [out.a out.k1 out.k2];
-% freqCenter(3) = 1/out.totalFrequency;
-% eventNumberCenter(3) = out.eventNumber;
-% lowTimeCenter(3) = out.lowTimes;
-% set(gca,'YLim',[1e-6 4e-3],'XLim',[0 2300]);
-% 
-% 
-% 
-% % plot the fit params:
-% %% amplitude, a
-% figure(503);
-% plot(dutyCycle,activationParamsCenter(:,1),'.','MarkerSize',15);shg
-% set(gca,'Ylim',[0 1],'Xlim',[0 5],'Box',true,'FontSize',16);
-% 
-% %% tau1
-% figure(504);
-% plot(dutyCycle,1./activationParamsCenter(:,2),'.','MarkerSize',15);shg
-% set(gca,'Ylim',[0 150],'Xlim',[0 5],'Box',true,'FontSize',16);
-% 
-% %% tau2
-% figure(505);
-% plot(dutyCycle,1./activationParamsCenter(:,3),'.','MarkerSize',15);shg
-% set(gca,'Ylim',[0 500],'Xlim',[0 5],'Box',true,'FontSize',16);
-% 
-% %% active trxn error bars
-% 
-% %% surv Freq of active trxn times. All spots; w/o dropouts
-% % initialize:
-% fignum = 533;
-% activationParamsDropout = zeros(3,3);
-% freqDropout = zeros(3,1);
-% eventNumberDropout = zeros(3,1);
-% lowTimeDropout = zeros(3,1);
-% expLengthMat = zeros(3,4);
-% meanExpLength = 3.2730e+03; % I got this from averaging all ten exp lengths computed in frequency_dwellFli2
-% 
-% % 4 frame/min:
-% timestep = 15; %using the acqn time
-% out = frequency_dwellFli3(dropout(space15cia),timestep,colr{1},fignum,[0.9 0.01 0.001],[]); % 
-% expLengthMat(1,1:2) = out.expLength;
-% activationParamsDropout(1,:) = [out.a out.k1 out.k2];
-% freqDropout(1) = 1/out.totalFrequency;
-% eventNumberDropout(1) = out.eventNumber;
-% lowTimeDropout(1) = out.lowTimes;
-% 
-% % 2 frame/min:
-% timestep = 30; %using the acqn time
-% hold on;
-% out = frequency_dwellFli3(dropout(spaceCia1),dropout(spaceCia2),timestep,colr{2},fignum,[0.9 0.01 0.001],[]); % 
-% expLengthMat(2,1:2) = out.expLength;
-% activationParamsDropout(2,:) = [out.a out.k1 out.k2];
-% freqDropout(2) = 1/out.totalFrequency;
-% eventNumberDropout(2) = out.eventNumber;
-% lowTimeDropout(2) = out.lowTimes;
-% 
-% % 1 frame/min:
-% timestep = 60; %using the acqn time
-% hold on;
-% out = frequency_dwellFli3(dropout(space60cia),timestep,colr{3},fignum,[0.9 0.01 0.001],[]); % 
-% expLengthMat(3,1:2) = out.expLength;
-% activationParamsDropout(3,:) = [out.a out.k1 out.k2];
-% freqDropout(3) = 1/out.totalFrequency;
-% eventNumberDropout(3) = out.eventNumber;
-% lowTimeDropout(3) = out.lowTimes;
-% set(gca,'YLim',[1e-6 4e-3],'XLim',[0 2300]);
-% 
-% %% active trxn plot w/error bars; w/o dropouts
-% fignum = 534;
-% BSnum = 1000;
-% tic;
-% [~,pbs15] = bootstrapsFrequency(dropout(space15cia),6,BSnum,freqDropout(1),colr{1},fignum);
-% hold on;
-% [~,pbs30] = bootstrapsFrequency(dropout(spaceCia),6,BSnum,freqDropout(2),colr{2},fignum);
-% hold on;
-% [~,pbs60] = bootstrapsFrequency(dropout(space60cia),6,BSnum,freqDropout(3),colr{3},fignum);
-% toc
-% % this will take about 5 min to run on your laptop machine with bs = 10000
-% 
-% % now add the data curves and fits: 
-% hold on;
-% % 4 frame/min:
-% timestep = 15; 
-% frequency_dwellFli3(dropout(space15cia),timestep,colr{1},fignum,[0.9 0.01 0.001],[]); 
-% % 2 frame/min:
-% timestep = 30; 
-% hold on;
-% frequency_dwellFli3(dropout(spaceCia1),dropout(spaceCia2),timestep,colr{2},fignum,[0.9 0.01 0.001],[]); % 
-% % 1 frame/min:
-% timestep = 60; 
-% hold on;
-% frequency_dwellFli3(dropout(space60cia),timestep,colr{3},fignum,[0.9 0.01 0.001],[]); % 
-% set(gca,'YLim',[1e-6 4e-3],'XLim',[0 2300]);
-% %% save this plot:
-% fp = 'C:\Users\thard\Dropbox\hardenTFfunction2020\figures\figs';
-% saveas(gca,[fp 'survFreqCurveFit&errPB220204'],'svg'); % saved using dell laptop 220204
-% 
-% %% active trxn fit errors; w/o dropouts
-% inarg = [1 3600 0.9 0.01 0.001]; %[tm tx a k1 k2]
-% numBs = 100;
-% pbActiveTrxnFits = {};
-% pbActiveTrxnFitsStd = zeros(3,3);
-% tic;
-% % 15 s
-% bsFits = bootstrapsBootstrapsFit(dropout(space15cia),6,numBs,2,inarg);
-% pbActiveTrxnFits{1} = bsFits;
-% pbActiveTrxnFitsStd(1,:) = bsFits.std;
-% % 30 s
-% bsFits = bootstrapsBootstrapsFit(dropout(spaceCia),6,numBs,2,inarg);
-% pbActiveTrxnFits{2} = bsFits;
-% pbActiveTrxnFitsStd(2,:) = bsFits.std;
-% % 60 s
-% bsFits = bootstrapsBootstrapsFit(dropout(space60cia),6,numBs,2,inarg);
-% pbActiveTrxnFits{3} = bsFits;
-% pbActiveTrxnFitsStd(3,:) = bsFits.std;
-% toc
-% % should take about 8 min on your lab machine with bs = 10000
-% 
-% %% table. active trxn PBing params. w/o dropout 
-% % set up table
-% Reporter = tits';
-% % rates:
-% % allocate:
-% A = zeros(3,1);k1 = A; k2 = A; %allocate space, amke things col vectors
-% Aerr = A; k1err = A; k2err = A;
-% errMat = pbActiveTrxnFitsStd;
-% for i = 1:3
-%     A(i) = round(activationParamsDropout(i,1),2);
-%     Aerr(i) = round(errMat(i,1),2);
-%     k1(i) = (activationParamsDropout(i,2));
-%     k1err(i) = round(errMat(i,2),3);
-%     k2(i) = (activationParamsDropout(i,3));
-%     k2err(i) = round(errMat(i,3),4);
-% end
-% % onTimes = table(Reporter,A,Aerr,k1,k1err,k2,k2err)
-% % taus:
-% t1 = 1./k1;
-% t2 = 1./k2;
-% %propagate errror:
-% t1err = round(1./k1.^2.*k1err);
-% t2err = round(1./k2.^2.*k2err,-1);
-% % % round
-% t1 = round(t1);
-% t2 = round(t2,-1);
-% activeParamsDropout = table(Reporter,A,Aerr,t1,t1err,t2,t2err)
+%% active trxn survival, center, SFig. 1C
+fignum = 530;
+numOfBS = 10000;
+flag = 1;
+inarg = [0.9 0.01 0.001];
+activationParamsCenterPB = zeros(3,3);
+for i = 1:3
+    [out,p] = survivalPlotFromVector((centerCia{i}),6,2,1,3600,fignum,inarg,colr{i}); %
+    set(p,'Color',colr{i});
+    if flag == 1 
+        [~,pbs] = bootstrapsBootstraps((centerCia{i}),6,numOfBS,colr{i},fignum);
+    end
+    hold on;
+    activationParamsCenterPB(i,:) = [out.a out.k1 out.k2];
+end
+set(gca,'Box',true,'FontSize',16,'YLim',[-6.5 0],'XLim',[0 2300]);
 
-%% surv Freq of on times. CENTER spots. w/o dropouts 
+%% save this plot:
+fp = 'C:\Users\tth12\Dropbox\hardenTFfunction2020\figures\figs\';
+saveas(gca,[fp 'survCurveFit&errPB220413'],'svg'); % 
+
+%% surv Freq of active transcription times. CENTER spots. (need for SFig. 1D)
 % use this to be consistent
 % initialize:
 fignum = 531;
@@ -375,7 +183,8 @@ meanExpLength = 3.2730e+03; % I got this from averaging all ten exp lengths comp
 
 % 4 frame/min:
 timestep = 15; %using half of the acqn time
-out = frequency_dwellFli3(dropout(centerCia{1}),timestep,colr{1},fignum,[0.9 0.01 0.001],[]); % 
+% out = frequency_dwellFli3(dropout(centerCia{1}),timestep,colr{1},fignum,[0.9 0.01 0.001],[]); % 
+out = frequency_dwellFli5((centerCia{1}),timestep,colr{1},fignum,[0.9 0.01 0.001],[]); % 
 expLengthMat(1,1:2) = out.expLength;
 activationParamsCenterDropout(1,:) = [out.a out.k1 out.k2];
 freqCenterDropout(1) = 1/out.totalFrequency;
@@ -386,7 +195,8 @@ lowTimeCenterDropout(1) = out.lowTimes;
 timestep = 30; %using half of the acqn time
 hold on;
 % out = frequency_dwellFli3(dropout(centerCia{2}),timestep,colr{2},fignum,[0.9 0.01 0.001],[]); 
-out = frequency_dwellFli3(dropout(centerCia1{1}),dropout(centerCia2{1}),timestep,colr{2},fignum,[0.9 0.01 0.001],[]); % % treat the two replicates separately
+% out = frequency_dwellFli3(dropout(centerCia1{1}),dropout(centerCia2{1}),timestep,colr{2},fignum,[0.9 0.01 0.001],[]); % 
+out = frequency_dwellFli5((centerCia1{1}),(centerCia2{1}),timestep,colr{2},fignum,[0.9 0.01 0.001],[]); % % treat the two replicates separately
 expLengthMat(2,1:2) = out.expLength;
 activationParamsCenterDropout(2,:) = [out.a out.k1 out.k2];
 freqCenterDropout(2) = 1/out.totalFrequency;
@@ -396,67 +206,77 @@ lowTimeCenterDropout(2) = out.lowTimes;
 % 1 frame/min:
 timestep = 60; %using half of the acqn time
 hold on;
-out = frequency_dwellFli3(dropout(centerCia{3}),timestep,colr{3},fignum,[0.9 0.01 0.001],[]); % 
+% out = frequency_dwellFli3(dropout(centerCia{3}),timestep,colr{3},fignum,[0.9 0.01 0.001],[]); % 
+out = frequency_dwellFli5((centerCia{3}),timestep,colr{3},fignum,[0.9 0.01 0.001],[]); % 
 expLengthMat(3,1:2) = out.expLength;
 activationParamsCenterDropout(3,:) = [out.a out.k1 out.k2];
 freqCenterDropout(3) = 1/out.totalFrequency;
 eventNumberCenterDropout(3) = out.eventNumber;
 lowTimeCenterDropout(3) = out.lowTimes;
-set(gca,'YLim',[9e-6 7e-3],'XLim',[0 2300]);
+set(gca,'YLim',[9e-6 1e-2],'XLim',[0 2300]);
 
-%% active trxn plot; CENTER; w/error bars; w/o dropouts
-fignum = 534;
-BSnum = 1000;
-tic;
-[~,pbs15] = bootstrapsFrequency(dropout(centerCia{1}),6,BSnum,freqCenterDropout(1),colr{1},fignum);
+%% idle period, table, all times, (need for SFig 1D)
+% define some terms: 
+% 1. event count: eventNumberCenterDropout
+% 2. total low time: lowTimeCenterDropout
+Reporter = tits';
+% counting error:
+eventErr = sqrt(eventNumberCenterDropout); 
+% frequencies:
+f = round(eventNumberCenterDropout./lowTimeCenterDropout,4);
+% error:
+ferr = round(eventErr./lowTimeCenterDropout,4);
+% period: 
+T = round(freqCenterDropout);
+% error
+Terr = round(lowTimeCenterDropout./eventNumberCenterDropout.^2.*eventErr);
+freqCenterDropoutTable = table(Reporter,f,ferr,T,Terr)
+%% idle period bar chart SFig 1D
+ax920 = figure(920);
+bar(1,T(1),0.4,'FaceColor',colr{1},'EdgeColor','none'); %initiate the bar chart first
+for i = 2:3
+    hold on; bar(i,T(i),0.4,'FaceColor',colr{i},'EdgeColor','none');
+end
+xticks([1 2 3]);
+set(gca,'xticklabels',tits(1:3),'yLim',[0 230],'Box',true,'FontSize',16,'xLim',[0.5 3.5]);
+xticklabel_rotate([],45,[],'FontSize',16);
 hold on;
-[~,pbs30] = bootstrapsFrequency(dropout(centerCia{2}),6,BSnum,freqCenterDropout(2),colr{2},fignum);
-hold on;
-[~,pbs60] = bootstrapsFrequency(dropout(centerCia{3}),6,BSnum,freqCenterDropout(3),colr{3},fignum);
-toc
-% this will take about 5 min to run on your laptop machine with bs = 10000
+er = errorbar(1,T(1),Terr(1),Terr(1));
+er.Color = colr{3};    %make the black neutral grey                       
+er.LineStyle = 'none'; 
+for i = 2:3
+    hold on;
+    er = errorbar(i,T(i),Terr(i),Terr(i));
+    er.Color = colr{1};    % make all err bars black                       
+    er.LineStyle = 'none'; 
+end
+set(gca,'Box',true);
+%% save 
+fp = 'C:\Users\tth12\Dropbox\hardenTFfunction2020\figures\figs\';
+saveas(gca,[fp 'idlePeriodPB220516'],'svg');
 
-% now add the data curves and fits: 
-hold on;
-% 4 frame/min:
-timestep = 15; 
-frequency_dwellFli3(dropout(centerCia{1}),timestep,colr{1},fignum,[0.9 0.01 0.001],[]); 
-% 2 frame/min:
-timestep = 30; 
-hold on;
-% frequency_dwellFli3(dropout(centerCia{2}),timestep,colr{2},fignum,[0.9 0.01 0.001],[]); 
-frequency_dwellFli3(dropout(centerCia1{1}),dropout(centerCia2{1}),timestep,colr{2},fignum,[0.9 0.01 0.001],[]); % treat the two replicates separately
-% 1 frame/min:
-timestep = 60; 
-hold on;
-frequency_dwellFli3(dropout(centerCia{3}),timestep,colr{3},fignum,[0.9 0.01 0.001],[]); % 
-set(gca,'YLim',[9e-6 7e-3],'XLim',[0 2300]);
-%% save this plot:
-fp = 'C:\Users\tth12\Dropbox\hardenTFfunction2020\figures\figs';
-saveas(gca,[fp 'survFreqCurveFit&errPB220210'],'svg'); % saved using dell laptop 220204
-
-%% active trxn fit errors; w/o dropouts
+%% active trxn fit errors (SFig 1C)
 inarg = [1 3600 0.9 0.01 0.001]; %[tm tx a k1 k2]
-numBs = 1000;
+numBs = 10000;
 pbActiveTrxnFits = {};
 pbActiveTrxnFitsStd = zeros(3,3);
 tic;
 % 15 s
-bsFits = bootstrapsBootstrapsFit(dropout(centerCia{1}),6,numBs,2,inarg);
+bsFits = bootstrapsBootstrapsFit((centerCia{1}),6,numBs,2,inarg);
 pbActiveTrxnFits{1} = bsFits;
 pbActiveTrxnFitsStd(1,:) = bsFits.std;
 % 30 s
-bsFits = bootstrapsBootstrapsFit(dropout(centerCia{2}),6,numBs,2,inarg);
+bsFits = bootstrapsBootstrapsFit((centerCia{2}),6,numBs,2,inarg);
 pbActiveTrxnFits{2} = bsFits;
 pbActiveTrxnFitsStd(2,:) = bsFits.std;
 % 60 s
-bsFits = bootstrapsBootstrapsFit(dropout(centerCia{3}),6,numBs,2,inarg);
+bsFits = bootstrapsBootstrapsFit((centerCia{3}),6,numBs,2,inarg);
 pbActiveTrxnFits{3} = bsFits;
 pbActiveTrxnFitsStd(3,:) = bsFits.std;
 toc
 % should take about 8 min on your lab machine with bs = 10000
 
-%% table. active trxn PBing params. w/o dropout 
+%% table. active trxn PBing params (SFig. 1C)
 % set up table
 Reporter = tits';
 % rates:
@@ -485,8 +305,8 @@ t2 = round(t2,-1);
 activeParamsDropout = table(Reporter,A,Aerr,t1,t1err,t2,t2err)
 
 
-% plot the fit params:
-%% amplitude, a; w/o dropouts
+% plot the fit params (not used to make figures):
+%% amplitude, a; 
 t = [0:0.01:5];
 figure(506);
 errorbar(dutyCycle,A,Aerr,'k.','MarkerSize',15);shg
@@ -498,17 +318,17 @@ yInt = ampFit.Intercept;
 m = ampFit.slope;
 ampFitCurve = m.*t + yInt;
 hold on;plot(t,ampFitCurve,'r');shg
-%% tau1; w/o dropouts
+%% tau1;
 figure(507);
 errorbar(dutyCycle,t1,t1err,'.','MarkerSize',15);shg
 set(gca,'Ylim',[0 150],'Xlim',[0 5],'Box',true,'FontSize',16);
 
-%% tau2; w/o dropouts
+%% tau2;
 figure(508);
 errorbar(dutyCycle,t2,t2err,'.','MarkerSize',15);shg
 set(gca,'Ylim',[0 500],'Xlim',[0 5],'Box',true,'FontSize',16);
 
-%% plotting the stripe center. 
+%% plotting the stripe center (unused for figs). 
 % Important bc I botched acquiring the ant and post images
 lim = [-0.2 0.25];
 xName = 'Fraction of nuclei';
@@ -572,7 +392,7 @@ xlabel('Position relative to stripe center (fraction of AP length)')
 % 220208 NB: These PDFs look all the same and, importantly, have their
 % peaks in the middle two bins, where our "center" nukes live
 
-%% first passage times:
+%% first passage times (SFig 1B):
 % plot data first:
 fignum = 550;
 ax550 = figure(fignum);
@@ -613,7 +433,7 @@ fp = 'C:\Users\tth12\Dropbox\hardenTFfunction2020\figures\figs\';
 saveas(ax550,[fp 'fpWTspacePBing22021'],'svg');
 %% first bind BS
 % generate bootstraps
-bs = 1000; 
+bs = 10000; 
 bsCell = {};
 tic;
 bsCell{1} = firstEventBootstrapGenerator2(space15anal,bins,boiC,bs);
@@ -635,7 +455,7 @@ fitErrStdAdjusted = std(fitErrStrucAdjusted);
 %% saved so you dont ahve to run again:
 % save C:\Users\thard\Dropbox\matlab\data\t1p54n.dat nFitErrStruc nBsCell
 save C:\Users\tth12\Dropbox\matlab\data\wtSpacePBingFirstPassageBootstrapCell220210.dat bsCell 
-%% plot FP bootstraps
+%% plot FP bootstraps (SFig 1B)
 fignum = 551; 
 ax551 = figure(fignum);
 % load C:\Users\thard\Dropbox\matlab\data\t1p54n1.dat -mat 
@@ -654,46 +474,7 @@ toc;
 fp = 'C:\Users\tth12\Dropbox\hardenTFfunction2020\figures\figs\';
 saveas(ax551,[fp 'fpWTspacePBingBootstraps220210'],'svg');
 
-%% idle bar charts
-% event frequwncies, center, dropout:
-% define some terms: 
-% 1. event count: eventNumberCenterDropout
-% 2. total low time: lowTimeCenterDropout
-Reporter = tits';
-% counting error:
-eventErr = sqrt(eventNumberCenterDropout); 
-% frequencies:
-f = round(eventNumberCenterDropout./lowTimeCenterDropout,4);
-% error:
-ferr = round(eventErr./lowTimeCenterDropout,4);
-% period: 
-T = round(freqCenterDropout,-1);
-% error
-Terr = round(lowTimeCenterDropout./eventNumberCenterDropout.^2.*eventErr,-1);
-freqCenterDropoutTable = table(Reporter,f,ferr,T,Terr)
-%% bar
-ax220 = figure(220);
-bar(1,T(1),0.4,'FaceColor',colr{1},'EdgeColor','none'); %initiate the bar chart first
-for i = 2:3
-    hold on; bar(i,T(i),0.4,'FaceColor',colr{i},'EdgeColor','none');
-end
-xticks([1 2 3]);
-set(gca,'xticklabels',tits(1:3),'yLim',[0 610],'Box',true,'FontSize',16,'xLim',[0.5 3.5]);
-xticklabel_rotate([],45,[],'FontSize',16);
-hold on;
-er = errorbar(1,T(1),Terr(1),Terr(1));
-er.Color = colr{3};    %make the black neutral grey                       
-er.LineStyle = 'none'; 
-for i = 2:3
-    hold on;
-    er = errorbar(i,T(i),Terr(i),Terr(i));
-    er.Color = colr{1};    % make all err bars black                       
-    er.LineStyle = 'none'; 
-end
-set(gca,'Box',true);
-% done 220702
-
-%%%%%%%%%%%%%%%%%%%%%
+%other things not used for figures:
 
 %% PDFs of active trxn times:
 % initialize
@@ -727,16 +508,12 @@ set(space60.j,'Color',colr{3});
 averages(3) = mean(space60cia(:,6));
 set(gca,'xLim',[0 1500]);
 
-% TO DO:
-% do the same, but with acquisition such that all conditions were 1
-% frame/min
-
 %% plot median active trxn time v duty cycle:
 figure(501);
 plot(dutyCycle,averages,'.','MarkerSize',15);shg
 set(gca,'Ylim',[0 400],'Xlim',[0 5],'Box',true,'FontSize',16);
 
-%% plot median active trxn time v duty cycle, no dropouts:
+%% plot median active trxn time v duty cycle:
 cia15dropout  = dropout(space15cia);
 averagesDrop(1) = mean(cia15dropout(:,6));
 cia30dropout = dropout(spaceCia);
